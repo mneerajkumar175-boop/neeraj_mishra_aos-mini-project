@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disk Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navBar">
+        <div class="logo">
+            <span>💽</span>
+            <h2>Disk Analyzer</h2>
+        </div>
+        <div class="nav-links">
+            <a href="#overview">Overview</a>
+            <a href="#simulator" class="active">Simulator</a>
+            <a href="#comparison">Compare</a>
+            <a href="#insights">Insights</a>
+        </div>
+        <div class="system-status">
+            <span class="status-dot"></span>
+            System Ready
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero" id="overview">
+            <div class="hero-icon">💽</div>
+            <div class="hero-text">
+                <h1>Disk Scheduling Simulator</h1>
+                <p>Explore head movement, compare algorithms, and understand disk performance.</p>
+            </div>
+        </section>
+
+        <section class="simulator-panel" id="simulator">
+            <div class="panel-header">
+                <h2>Simulation Configuration</h2>
+                <p>Configure your disk parameters and run the simulation.</p>
+            </div>
+
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="diskSize">Disk Size</label>
+                    <input type="number" id="diskSize" value="200" min="1" placeholder="Enter disk size">
+                </div>
+                <div class="input-group">
+                    <label for="headPosition">Head Position</label>
+                    <input type="number" id="headPosition" value="53" min="0" placeholder="Enter head position">
+                </div>
+                <div class="input-group request-input">
+                    <label for="requests">Request Queue</label>
+                    <input type="text" id="requests" placeholder="98, 183, 37, 122, 14, 124, 65, 67">
+                </div>
+                <div class="input-group">
+                    <label for="algorithms">Select Algorithm</label>
+                    <select name="algorithms" id="algorithms">
+                        <option value="FCFS">FCFS</option>
+                        <option value="SSTF">SSTF</option>
+                        <option value="SCAN">SCAN</option>
+                        <option value="CSCAN">C-SCAN</option>
+                        <option value="LOOK">LOOK</option>
+                        <option value="CLOOK">C-LOOK</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="direction">Head Direction</label>
+                    <select name="direction" id="direction">
+                        <option value="right">Right</option>
+                        <option value="left">Left</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="runBtn" class="run-btn" type="button">▶ Run Simulation</button>
+                <button id="resetBtn" class="reset-btn" type="button">↻ Reset</button>
+            </div>
+            <p id="message" role="status" aria-live="polite"></p>
+        </section>
+
+        <section class="performance-section" id="performance">
+            <div class="section-title">
+                <h2>Performance Overview</h2>
+                <p>Real-time statistics of your disk scheduling simulation.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stats-card">
+                    <div class="stats-icon">↔</div>
+                    <h3>Total Head Movement</h3>
+                    <p id="totalMovement">--</p>
+                    <span>Cylinders</span>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-icon">📋</div>
+                    <h3>Requests Processed</h3>
+                    <p id="processedRequests">--</p>
+                    <span>Total requests</span>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-icon">⚡</div>
+                    <h3>Average Movement</h3>
+                    <p id="averageMovement">--</p>
+                    <span>Per request</span>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-icon">🏆</div>
+                    <h3>Best Algorithm</h3>
+                    <p id="bestAlgorithm">--</p>
+                    <span>Minimum movement</span>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-heading">
+                    <div>
+                        <h2>Head Movement Visualization</h2>
+                        <p>Track how the disk head moves between cylinders.</p>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="movementChart"></canvas>
+                </div>
+            </div>
+
+            <div class="sequence-card">
+                <h2>Execution Sequence</h2>
+                <p class="sequence-description">The order in which disk requests are processed. Boundary positions and circular jumps are also shown.</p>
+                <div id="sequenceOutput" class="sequence-output">Run a simulation to see the execution sequence.</div>
+            </div>
+        </section>
+
+        <section class="comparison-section" id="comparison">
+            <div class="section-title">
+                <h2>Algorithm Comparison</h2>
+                <p>Compare the performance of different disk scheduling algorithms.</p>
+            </div>
+
+            <div class="comparison-card">
+                <div class="comparison-heading">
+                    <div>
+                        <h3>Head Movement Comparison</h3>
+                        <p>Lower head movement means better performance.</p>
+                    </div>
+                </div>
+                <div class="comparison-chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+
+            <div class="performance-summary">
+                <div class="summary-card">
+                    <h3>Processed Requests</h3>
+                    <p id="processedCount">0</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Total Steps</h3>
+                    <p id="totalSteps">0</p>
+                </div>
+            </div>
+
+            <div class="comparison-card">
+                <h3>Algorithm Performance Table</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>Head Movement</th>
+                                <th>Average Movement</th>
+                                <th>Steps</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparisonTableBody">
+                            <tr><td colspan="4">Run simulation to see comparison results.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="comparison-card">
+                <h3>Request Processing Details</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Step</th>
+                                <th>Current Position</th>
+                                <th>Next Position</th>
+                                <th>Head Movement</th>
+                            </tr>
+                        </thead>
+                        <tbody id="movementTableBody">
+                            <tr><td colspan="4">Run simulation to see results.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="insights-section" id="insights">
+            <div class="section-title">
+                <h2>Performance Insights</h2>
+                <p>Understand the results of your disk scheduling simulation.</p>
+            </div>
+            <div class="insights-card">
+                <div class="insights-icon">💡</div>
+                <div class="insights-content">
+                    <h3>Simulation Analysis</h3>
+                    <p id="insightText">Run an algorithm comparison to generate performance insights.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
